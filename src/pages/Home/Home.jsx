@@ -8,7 +8,7 @@ import Box from '@material-ui/core/Box';
 export default class Home extends React.Component {
   render = () => {
     return (
-      <Query query={GET_MY_PROFILE}>
+      <Query query={GET_MY_PROFILE} fetchPolicy="no-cache">
       {({loading, data}) => {
         if (loading) {
           return (
@@ -17,13 +17,16 @@ export default class Home extends React.Component {
             </Box>
           );
         }
-        if (data) return (
+        if (data) {
+          const { getMyProfile: { role } } = data;
+          return (
             <>
               <Route exact path="/home">
-                <Redirect to={`/home/${data.getMyProfile.role}`} />
+                <Redirect to={`/home/${role}`} />
               </Route>
             </>
         );
+        }
       }}
     </Query>
     );

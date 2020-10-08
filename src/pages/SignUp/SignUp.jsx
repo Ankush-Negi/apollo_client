@@ -1,4 +1,6 @@
 import React from 'react';
+import { Mutation } from '@apollo/react-components';
+import { SIGNUP_USER } from './mutation';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -38,7 +40,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function SignUp(props) {
+const SignUp = (props) => {
   const customStyle = {
     "fontSize": "12px",
     "color": "red",
@@ -54,7 +56,6 @@ export default function SignUp(props) {
     password: "",
     confirmPassword: "",
     isValid: false,
-    loader: false,
     allErrors: {},
     touch: {
       Email: true,
@@ -67,7 +68,7 @@ export default function SignUp(props) {
     },
   })
 
-  async function handleChange(evt) {
+  const handleChange = async(evt) => {
     const value = evt.target.value;
     await setState({
       ...state,
@@ -75,25 +76,25 @@ export default function SignUp(props) {
     });
   }
 
-  async function toggler() {
+  const toggler = async() => {
     await setState({
       ...state,
-      loader: true,
       isValid: false,
     });
   }
 
-  async function handleLoader(signUpUser, openSnackBar) {
+  const handleLoader = async(signUpUser, openSnackBar) => {
       await toggler();
       try {
         const { email, password, name, address, dob, role } = state;
         const { history } = props;
-        const response = await signUpUser({ variables: { name, email, password, address, dob, role } });
+        const data = { email, password, name, address, dob, role };
+        const response = await signUpUser({ variables: { data } });
         const { data: { signUpUser: signUp } } = response;
         if(signUp) {
           openSnackBar('Sign Up successful', 'success');
         }
-        setState({ ...state, loader: false, isValid: true });
+        setState({ ...state, isValid: true });
         history.push('/login');
       } catch (error) {
         toggler();
@@ -101,7 +102,7 @@ export default function SignUp(props) {
       }
   }
 
-   function hasError(field) {
+   const hasError = (field) => {
     const {
       allErrors, touch, email, password, name, address, dob, role, confirmPassword,
     } = state;
@@ -136,7 +137,7 @@ export default function SignUp(props) {
     });
   }
 
-  function getError(field) {
+  const getError = (field) => {
     const {
       touch, allErrors, isValid,
     } = state;
@@ -157,7 +158,7 @@ export default function SignUp(props) {
     return allErrors[field];
   }
 
-  function isTouched(value) {
+  const isTouched = (value) => {
     const { touch } = state;
     delete touch[value];
     setState({
@@ -167,165 +168,172 @@ export default function SignUp(props) {
   }
 
   const {
-    loader,
     isValid,
   } = state;
-  const { signUpUser } = props;
   return (
-    <Container component="main" maxWidth="xs">
-      <CssBaseline />
-      <div className={classes.paper}>
-        <Avatar className={classes.avatar}>
-          <LockOutlinedIcon />
-        </Avatar>
-        <Typography component="h1" variant="h5">
-          Sign up
-        </Typography>
-        <form className={classes.form} noValidate>
-          <Grid container spacing={2}>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                name="name"
-                variant="outlined"
-                required
-                fullWidth
-                id="Name"
-                label="Name"
-                value={state.name}
-                error={!!getError('Name')}
-                helperText={getError('Name')}
-                onChange={handleChange}
-                onBlur={() => isTouched('Name')}
-              />
+    <Mutation mutation={SIGNUP_USER}>
+    {(signUpUser, { loading }) => (
+      <>
+      <Container component="main" maxWidth="xs">
+        <CssBaseline />
+        <div className={classes.paper}>
+          <Avatar className={classes.avatar}>
+            <LockOutlinedIcon />
+          </Avatar>
+          <Typography component="h1" variant="h5">
+            Sign up
+          </Typography>
+          <form className={classes.form} noValidate>
+            <Grid container spacing={2}>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  name="name"
+                  variant="outlined"
+                  required
+                  fullWidth
+                  id="Name"
+                  label="Name"
+                  value={state.name}
+                  error={!!getError('Name')}
+                  helperText={getError('Name')}
+                  onChange={handleChange}
+                  onBlur={() => isTouched('Name')}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  variant="outlined"
+                  required
+                  fullWidth
+                  id="dob"
+                  label="DOB"
+                  value={state.dob}
+                  name="dob"
+                  error={!!getError('Dob')}
+                  helperText={getError('Dob')}
+                  onChange={handleChange}
+                  onBlur={() => isTouched('Dob')}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  variant="outlined"
+                  required
+                  fullWidth
+                  id="email"
+                  label="Email Address"
+                  value={state.email}
+                  name="email"
+                  error={!!getError('Email')}
+                  helperText={getError('Email')}
+                  onChange={handleChange}
+                  onBlur={() => isTouched('Email')}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  variant="outlined"
+                  required
+                  fullWidth
+                  id="address"
+                  label="Address"
+                  value={state.address}
+                  name="address"
+                  error={!!getError('Address')}
+                  helperText={getError('Address')}
+                  onChange={handleChange}
+                  onBlur={() => isTouched('Address')}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <InputLabel id="demo-simple-select-helper-label">Role*</InputLabel>
+                <Select
+                  labelId="demo-simple-select-helper-label"
+                  id="demo-simple-select-helper"
+                  value={state.role}
+                  onChange={handleChange}
+                  fullWidth
+                  name="role"
+                  onBlur={() => isTouched('Role')} 
+                  error={!!getError('Role')}
+                >
+                  <MenuItem value="">
+                    <em>None</em>
+                  </MenuItem>
+                  <MenuItem value="user">User</MenuItem>
+                  <MenuItem value="product-manager">Product Manager</MenuItem>
+                </Select>
+                <p style={customStyle}>{getError('Role')}</p>
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  variant="outlined"
+                  required
+                  fullWidth
+                  name="password"
+                  label="Password"
+                  type="password"
+                  value={state.password}
+                  id="password"
+                  error={!!getError('Password')}
+                  helperText={getError('Password')}
+                  onChange={handleChange}
+                  onBlur={() => isTouched('Password')}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  variant="outlined"
+                  required
+                  fullWidth
+                  name="confirmPassword"
+                  label="Confirm Password"
+                  type="password"
+                  value={state.confirmPassword}
+                  id="confirmPassword"
+                  error={!!getError('ConfirmPassword')}
+                  helperText={getError('ConfirmPassword')}
+                  onChange={handleChange}
+                  onBlur={() => isTouched('ConfirmPassword')}
+                />
+              </Grid>
             </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                variant="outlined"
-                required
-                fullWidth
-                id="dob"
-                label="DOB"
-                value={state.dob}
-                name="dob"
-                error={!!getError('Dob')}
-                helperText={getError('Dob')}
-                onChange={handleChange}
-                onBlur={() => isTouched('Dob')}
-              />
+            <MyContext.Consumer>
+              {(value) => (
+                <Button
+                  fullWidth
+                  variant="contained"
+                  color="primary"
+                  className={classes.submit}
+                  disabled={!isValid}
+                  onClick={async () => {
+                    handleLoader(signUpUser, value.openSnackBar);
+                  }}
+                >
+                  <span>{loading ? <CircularProgress size={20} /> : ''}</span>
+                  Sign Up
+                </Button>
+              )}
+            </MyContext.Consumer>
+            <Grid container justify="flex-end">
+              <Grid item>
+                <Link href="/login" variant="body2">
+                  Already have an account? Sign in
+                </Link>
+              </Grid>
             </Grid>
-            <Grid item xs={12}>
-              <TextField
-                variant="outlined"
-                required
-                fullWidth
-                id="email"
-                label="Email Address"
-                value={state.email}
-                name="email"
-                error={!!getError('Email')}
-                helperText={getError('Email')}
-                onChange={handleChange}
-                onBlur={() => isTouched('Email')}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                variant="outlined"
-                required
-                fullWidth
-                id="address"
-                label="Address"
-                value={state.address}
-                name="address"
-                error={!!getError('Address')}
-                helperText={getError('Address')}
-                onChange={handleChange}
-                onBlur={() => isTouched('Address')}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <InputLabel id="demo-simple-select-helper-label">Role*</InputLabel>
-              <Select
-                labelId="demo-simple-select-helper-label"
-                id="demo-simple-select-helper"
-                value={state.role}
-                onChange={handleChange}
-                fullWidth
-                name="role"
-                onBlur={() => isTouched('Role')} 
-                error={!!getError('Role')}
-              >
-                <MenuItem value="">
-                  <em>None</em>
-                </MenuItem>
-                <MenuItem value="user">User</MenuItem>
-                <MenuItem value="product-manager">Product Manager</MenuItem>
-              </Select>
-              <p style={customStyle}>{getError('Role')}</p>
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                variant="outlined"
-                required
-                fullWidth
-                name="password"
-                label="Password"
-                type="password"
-                value={state.password}
-                id="password"
-                error={!!getError('Password')}
-                helperText={getError('Password')}
-                onChange={handleChange}
-                onBlur={() => isTouched('Password')}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                variant="outlined"
-                required
-                fullWidth
-                name="confirmPassword"
-                label="Confirm Password"
-                type="password"
-                value={state.confirmPassword}
-                id="confirmPassword"
-                error={!!getError('ConfirmPassword')}
-                helperText={getError('ConfirmPassword')}
-                onChange={handleChange}
-                onBlur={() => isTouched('ConfirmPassword')}
-              />
-            </Grid>
-          </Grid>
-          <MyContext.Consumer>
-            {(value) => (
-              <Button
-                fullWidth
-                variant="contained"
-                color="primary"
-                className={classes.submit}
-                disabled={!isValid}
-                onClick={async () => {
-                  handleLoader(signUpUser, value.openSnackBar);
-                }}
-              >
-                <span>{loader ? <CircularProgress size={20} /> : ''}</span>
-                Sign Up
-              </Button>
-            )}
-          </MyContext.Consumer>
-          <Grid container justify="flex-end">
-            <Grid item>
-              <Link href="/login" variant="body2">
-                Already have an account? Sign in
-              </Link>
-            </Grid>
-          </Grid>
-        </form>
-      </div>
-    </Container>
+          </form>
+        </div>
+      </Container>
+      </>
+    )}
+  </Mutation>
+
   );
 }
 
 SignUp.propTypes = {
   history: PropTypes.objectOf(PropTypes.any).isRequired,
 };
+
+export default SignUp;

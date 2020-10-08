@@ -36,13 +36,10 @@ class EditDialog extends React.Component {
       this.setState({
         name: event.target.value,
         isValid: true,
-      }, () => {
-        this.setState({
-          touched: {
-            ...touched,
-            name: true,
-          },
-        });
+        touched: {
+          ...touched,
+          name: true,
+        },
       });
     };
 
@@ -51,34 +48,27 @@ class EditDialog extends React.Component {
       this.setState({
         email: event.target.value,
         isValid: true,
-      }, () => {
-        this.setState({
-          touched: {
-            ...touched,
-            email: true,
-          },
-        });
+        touched: {
+          ...touched,
+          email: true,
+        },
       });
     };
 
     isTouched = (value) => {
       const { touched } = this.state;
       const { data } = this.props;
-      this.setState({
-        touched: {
-          ...touched,
-          [value]: true,
-
-        },
-        isValid: true,
-      }, () => {
         Object.keys(data).forEach((keys) => {
           if (!touched[keys]) {
             this.setState({
               [keys]: data[keys],
+              touched: {
+                ...touched,
+                [value]: true,
+              },
+              isValid: true,
             });
           }
-        });
       });
     }
 
@@ -89,7 +79,6 @@ class EditDialog extends React.Component {
     }
 
     handleSubmit = async(openSnackBar) => {
-
       this.toggler();
       const { onClose, data, onSubmit } = this.props;
       const { name, email } = this.state;

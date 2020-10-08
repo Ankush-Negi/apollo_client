@@ -27,7 +27,7 @@ const useStyles = {
   },
 };
 
-function ProductList(props) {
+const ProductList = (props) => {
   const [ state, setState ] = useState({
     all: false,
     open: false,
@@ -69,7 +69,7 @@ const handleOnSubmitDelete = (deleteProduct) => async(values) => {
   }
 }
 
-async function handleSort(value) {
+const handleSort = async(value) => {
   const { orderBy, order } = state;
   const isAsc = orderBy === value && order === 'asc';
   const data = isAsc ? 'desc' : 'asc';
@@ -80,11 +80,11 @@ async function handleSort(value) {
   });
 }
 
-async function handleEditDialogOpen(values) {
+const handleEditDialogOpen = async(values) => {
   setState({ ...state, editOpen: true, rowData: values });
 }
 
-async function handleRemoveDialogOpen(values) {
+const handleRemoveDialogOpen = async(values) => {
   setState({ ...state, removeOpen: true, rowData: values });
 }
 
@@ -113,7 +113,8 @@ const handleProductChange = async(event) => {
 const handleOnSubmitAdd = (createProduct) => async (values) => {
   try {
     const { name, price, description } = values;
-    const response = await createProduct({ variables: { name, price, description } });
+    const data = { name, price, description };
+    const response = await createProduct({ variables: { data } });
     return { response }
   } catch (error) {
     return { error };
@@ -123,7 +124,8 @@ const handleOnSubmitAdd = (createProduct) => async (values) => {
 const handleOnSubmitEdit = (updateProduct) => async (values) => {
   try {
     const { name, price, description, id } = values;
-    const response = await updateProduct({ variables: { name, price, description, id } });
+    const data = { name, price, description };
+    const response = await updateProduct({ variables: { id, data } });
     return { response };
   } catch (error) {
     return { error };

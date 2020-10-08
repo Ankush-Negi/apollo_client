@@ -1,1 +1,1 @@
-export { default as SignUp } from './Wrapper';
+export { default as SignUp } from './SignUp';

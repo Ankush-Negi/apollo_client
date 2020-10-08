@@ -32,17 +32,14 @@ class EditProdDialog extends React.Component {
   }
 
     handleNameChange = (event) => {
-      const { touched } = this.setState;
+      const { touched } = this.state;
       this.setState({
         name: event.target.value,
         isValid: true,
-      }, () => {
-        this.setState({
-          touched: {
-            ...touched,
-            name: true,
-          },
-        });
+        touched: {
+          ...touched,
+          name: true,
+        },
       });
     };
 
@@ -51,13 +48,10 @@ class EditProdDialog extends React.Component {
       this.setState({
         price: event.target.value,
         isValid: true,
-      }, () => {
-        this.setState({
-          touched: {
-            ...touched,
-            price: true,
-          },
-        });
+        touched: {
+          ...touched,
+          price: true,
+        },
       });
     };
 
@@ -66,34 +60,26 @@ class EditProdDialog extends React.Component {
         this.setState({
           description: event.target.value,
           isValid: true,
-        }, () => {
-          this.setState({
-            touched: {
-              ...touched,
-              description: true,
-            },
-          });
+          touched: {
+            ...touched,
+            description: true,
+          }
         });
       };
 
     isTouched = (value) => {
       const { touched } = this.state;
       const { data } = this.props;
-      this.setState({
-        touched: {
-          ...touched,
-          [value]: true,
-
-        },
-        isValid: true,
-      }, () => {
         Object.keys(data).forEach((keys) => {
           if (!touched[keys]) {
             this.setState({
               [keys]: data[keys],
+              touched: {
+                ...touched,
+                [value]: true,
+              }
             });
-          }
-        });
+        }
       });
     }
 

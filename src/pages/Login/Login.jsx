@@ -1,4 +1,6 @@
 import React from 'react';
+import { Mutation } from '@apollo/react-components';
+import { LOGIN_USER } from './mutation';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
@@ -55,7 +57,6 @@ class LoginPage extends React.Component {
       email: '',
       password: '',
       isValid: false,
-      loader: false,
       allErrors: {},
       touch: {
         Email: true,
@@ -74,7 +75,6 @@ class LoginPage extends React.Component {
 
   toggler = async() => {
     await this.setState({
-      loader: true,
       isValid: false,
     });
   }
@@ -84,7 +84,8 @@ class LoginPage extends React.Component {
     try {
       const { email, password } = this.state;
       const { history } = this.props;
-      const response = await loginUser({ variables: { email, password } });
+      const data = { email, password };
+      const response = await loginUser({ variables: { data } });
       const { data: { loginUser: token } } = response;
       ls.set('token', token);
       history.push('/home');
@@ -142,85 +143,91 @@ class LoginPage extends React.Component {
   };
 
   render = () => {
-    const { classes, loginUser } = this.props;
+    const { classes } = this.props;
     const {
-      loader,
       isValid,
     } = this.state;
     return (
-      <div>
-        <Grid container className={classes.container}>
-          <div className={classes.paper}>
-            <Avatar className={classes.avatar}>
-              <LockOutlinedIcon />
-            </Avatar>
-            <Typography component="h3" variant="h5">
-              Login
-            </Typography>
-            <Grid item xs={12} className={classes.grid}>
-              <TextField
-                label="Email Address"
-                variant="outlined"
-                fullWidth
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <EmailIcon />
-                    </InputAdornment>
-                  ),
-                }}
-                error={!!this.getError('Email')}
-                helperText={this.getError('Email')}
-                onChange={this.handleEmailChange}
-                onBlur={() => this.isTouched('Email')}
-              />
-            </Grid>
-            <Grid item xs={12} className={classes.grid}>
-              <TextField
-                label="Password"
-                type="password"
-                variant="outlined"
-                fullWidth
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <VisibilityOffIcon />
-                    </InputAdornment>
-                  ),
-                }}
-                error={!!this.getError('Password')}
-                helperText={this.getError('Password')}
-                onChange={this.handlePasswordChange}
-                onBlur={() => this.isTouched('Password')}
-              />
-            </Grid>
-            <MyContext.Consumer>
-              {(value) => (
-                <Button
-                  className={classes.submit}
+      <Mutation mutation={LOGIN_USER}>
+      {(loginUser, { loading }) => (
+        <>
+        <div>
+          <Grid container className={classes.container}>
+            <div className={classes.paper}>
+              <Avatar className={classes.avatar}>
+                <LockOutlinedIcon />
+              </Avatar>
+              <Typography component="h3" variant="h5">
+                Login
+              </Typography>
+              <Grid item xs={12} className={classes.grid}>
+                <TextField
+                  label="Email Address"
+                  variant="outlined"
                   fullWidth
-                  variant="contained"
-                  disabled={!isValid}
-                  color="primary"
-                  onClick={async () => {
-                    this.handleLoader(loginUser, value.openSnackBar);
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <EmailIcon />
+                      </InputAdornment>
+                    ),
                   }}
-                >
-                  <span>{loader ? <CircularProgress size={20} /> : ''}</span>
-                  Sign In
-                </Button>
-              )}
-            </MyContext.Consumer>
-          <Grid container justify="flex-end">
-            <Grid item>
-              <Link href="/sign-up" variant="body2">
-                Create Account? Sign Up
-              </Link>
-            </Grid>
+                  error={!!this.getError('Email')}
+                  helperText={this.getError('Email')}
+                  onChange={this.handleEmailChange}
+                  onBlur={() => this.isTouched('Email')}
+                />
+              </Grid>
+              <Grid item xs={12} className={classes.grid}>
+                <TextField
+                  label="Password"
+                  type="password"
+                  variant="outlined"
+                  fullWidth
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <VisibilityOffIcon />
+                      </InputAdornment>
+                    ),
+                  }}
+                  error={!!this.getError('Password')}
+                  helperText={this.getError('Password')}
+                  onChange={this.handlePasswordChange}
+                  onBlur={() => this.isTouched('Password')}
+                />
+              </Grid>
+              <MyContext.Consumer>
+                {(value) => (
+                  <Button
+                    className={classes.submit}
+                    fullWidth
+                    variant="contained"
+                    disabled={!isValid}
+                    color="primary"
+                    onClick={async () => {
+                      this.handleLoader(loginUser, value.openSnackBar);
+                    }}
+                  >
+                    <span>{loading ? <CircularProgress size={20} /> : ''}</span>
+                    Sign In
+                  </Button>
+                )}
+              </MyContext.Consumer>
+              <Grid container justify="flex-end">
+                <Grid item>
+                  <Link href="/sign-up" variant="body2">
+                    Create Account? Sign Up
+                  </Link>
+                </Grid>
+              </Grid>
+            </div>
           </Grid>
-          </div>
-        </Grid>
-      </div>
+        </div>
+        </>
+      )}
+    </Mutation>
+
     );
   }
 }
@@ -228,7 +235,6 @@ class LoginPage extends React.Component {
 LoginPage.propTypes = {
   classes: PropTypes.objectOf(PropTypes.string).isRequired,
   history: PropTypes.objectOf(PropTypes.any).isRequired,
-  loginUser: PropTypes.func.isRequired,
 };
 
 export default withStyles(styles)(LoginPage);

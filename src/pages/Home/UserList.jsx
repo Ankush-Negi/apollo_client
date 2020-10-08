@@ -24,7 +24,7 @@ const useStyles = {
   },
 };
 
-function UserList(props) {
+const UserList = (props) => {
   const [ state, setState ] = useState({
     open: false,
     order: 'asc',
@@ -109,7 +109,7 @@ const handleSort = (value) => {
   });
 }
 
-async function handleEditDialogOpen(values) {
+const handleEditDialogOpen = async(values) => {
   setState({ ...state, editOpen: true, rowData: values });
 }
 
@@ -127,7 +127,8 @@ const handleChangePage = (refetch) => async(event, newPage) => {
 const handleOnSubmitAdd = (createUser) => async (values) => {
   try {
     const { name, email, password, address, dob, role } = values;
-    const response = await createUser({ variables: { name, email, password,address, dob, role } });
+    const data = { name, email, password, address, dob, role };
+    const response = await createUser({ variables: { data } });
     return { response }
   } catch (error) {
     return { error };

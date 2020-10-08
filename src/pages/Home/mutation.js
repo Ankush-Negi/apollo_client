@@ -1,8 +1,8 @@
 import { gql } from 'apollo-boost';
 
 const CREATE_USER = gql`
-mutation CreateUser($name: String!, $email: String!, $role: String!, $dob: String!, $address: String!, $password: String!){
-      createUser(user: {name: $name, email: $email, role: $role, dob: $dob, address: $address, password: $password})
+mutation CreateUser($data: userCreateInput){
+      createUser(user: $data)
 }
 `;
 
@@ -31,14 +31,14 @@ mutation DeleteOrder($id: ID!){
 `;
 
 const CREATE_PRODUCT = gql`
-mutation CreateProduct($name: String!, $price: Int!, $description: String!){
-      createProduct(product: {name: $name, price: $price, description: $description})
+mutation CreateProduct($data: productCreateInput){
+      createProduct(product: $data)
 }
 `;
 
 const UPDATE_PRODUCT = gql`
-mutation UpdateProduct($id: ID!, $name: String, $description: String, $price: Int){
-      updateProduct(id: $id, dataToUpdate: {name: $name, price: $price, description: $description})
+mutation UpdateProduct($id: ID!, $data: productUpdateInput){
+      updateProduct(id: $id, dataToUpdate: $data)
 }
 `;
 

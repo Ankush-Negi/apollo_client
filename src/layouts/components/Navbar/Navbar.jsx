@@ -24,7 +24,7 @@ const useStyles = makeStyles({
   },
 });
 
-export default function Navbar() {
+const Navbar = () => {
   const classes = useStyles();
   const logout = () => {
     ls.clear();
@@ -47,3 +47,5 @@ export default function Navbar() {
     </div>
   );
 }
+
+export default Navbar;

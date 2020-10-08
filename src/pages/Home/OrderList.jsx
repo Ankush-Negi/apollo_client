@@ -22,7 +22,7 @@ const useStyles = {
   },
 };
 
-function OrderList(props) {
+const OrderList = (props) => {
   const [ state, setState ] = useState({
     all: true,
     open: false,
